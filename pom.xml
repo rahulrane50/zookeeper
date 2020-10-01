@@ -610,7 +610,7 @@
         <plugin>
           <groupId>net.nicoulaj.maven.plugins</groupId>
           <artifactId>checksum-maven-plugin</artifactId>
-          <version>1.8</version>
+          <version>1.9</version>
         </plugin>
         <plugin>
           <groupId>org.openclover</groupId>
@@ -920,7 +920,7 @@
       </plugin>
     </plugins>
   </reporting>
-  
+
   <distributionManagement>
     <repository>
       <id>bintray-linkedin-maven</id>

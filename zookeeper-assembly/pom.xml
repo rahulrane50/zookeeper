@@ -169,7 +169,7 @@
         <artifactId>maven-deploy-plugin</artifactId>
         <configuration>
           <!-- this module isn't to be deployed to Maven Central -->
-          <skip>true</skip>
+<!--          <skip>true</skip>-->
         </configuration>
       </plugin>
 

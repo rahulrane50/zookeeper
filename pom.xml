@@ -607,11 +607,11 @@
           <artifactId>build-helper-maven-plugin</artifactId>
           <version>3.0.0</version>
         </plugin>
-        <plugin>
-          <groupId>net.nicoulaj.maven.plugins</groupId>
-          <artifactId>checksum-maven-plugin</artifactId>
-          <version>1.9</version>
-        </plugin>
+<!--        <plugin>-->
+<!--          <groupId>net.nicoulaj.maven.plugins</groupId>-->
+<!--          <artifactId>checksum-maven-plugin</artifactId>-->
+<!--          <version>1.9</version>-->
+<!--        </plugin>-->
         <plugin>
           <groupId>org.openclover</groupId>
           <artifactId>clover-maven-plugin</artifactId>
@@ -785,25 +785,25 @@
           <excludePackageNames>*.recipes.*</excludePackageNames>
         </configuration>
       </plugin>
-      <plugin>
-        <!-- Maven's deploy plugin only creates checksums during the deployment of the jar artifacts to repo. -->
-        <!-- We also want to sign tarballs. Nicoulaj's plugin is the recommended solution by the community.   -->
-        <groupId>net.nicoulaj.maven.plugins</groupId>
-        <artifactId>checksum-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>artifacts</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <algorithms>
-            <algorithm>SHA-512</algorithm>
-          </algorithms>
-          <appendFilename>true</appendFilename>
-        </configuration>
-      </plugin>
+<!--      <plugin>-->
+<!--        &lt;!&ndash; Maven's deploy plugin only creates checksums during the deployment of the jar artifacts to repo. &ndash;&gt;-->
+<!--        &lt;!&ndash; We also want to sign tarballs. Nicoulaj's plugin is the recommended solution by the community.   &ndash;&gt;-->
+<!--        <groupId>net.nicoulaj.maven.plugins</groupId>-->
+<!--        <artifactId>checksum-maven-plugin</artifactId>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <goals>-->
+<!--              <goal>artifacts</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--        <configuration>-->
+<!--          <algorithms>-->
+<!--            <algorithm>SHA-512</algorithm>-->
+<!--          </algorithms>-->
+<!--          <appendFilename>true</appendFilename>-->
+<!--        </configuration>-->
+<!--      </plugin>-->
 
       <plugin>
         <groupId>com.github.spotbugs</groupId>

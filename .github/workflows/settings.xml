@@ -4,7 +4,7 @@
   <servers>
     <server>
       <!-- the following env vars come from linkedin/zookeeper secrets -->
-      <id>central</id>
+      <id>jfrog-linkedin</id>
       <username>${env.MVN_DEPLOY_JFROG_USER}</username>
       <password>${env.MVN_DEPLOY_JFROG_KEY}</password>
     </server>
@@ -16,14 +16,8 @@
           <snapshots>
             <enabled>false</enabled>
           </snapshots>
-          <id>central</id>
-          <name>open-source</name>
-          <url>https://linkedin.jfrog.io/artifactory/open-source</url>
-        </repository>
-        <repository>
-          <snapshots />
-          <id>snapshots</id>
-          <name>open-source</name>
+          <id>jfrog-linkedin</id>
+          <name>jfrog</name>
           <url>https://linkedin.jfrog.io/artifactory/open-source</url>
         </repository>
       </repositories>
@@ -32,14 +26,8 @@
           <snapshots>
             <enabled>false</enabled>
           </snapshots>
-          <id>central</id>
-          <name>open-source</name>
-          <url>https://linkedin.jfrog.io/artifactory/open-source</url>
-        </pluginRepository>
-        <pluginRepository>
-          <snapshots />
-          <id>snapshots</id>
-          <name>open-source</name>
+          <id>jfrog-linkedin</id>
+          <name>jfrog-plugins</name>
           <url>https://linkedin.jfrog.io/artifactory/open-source</url>
         </pluginRepository>
       </pluginRepositories>

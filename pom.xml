@@ -925,7 +925,7 @@
   <distributionManagement>
     <repository>
       <id>jfrog-linkedin</id>
-      <name>linkedin-jfrog</name>
+      <name>linkedin-releases</name>
       <url>https://linkedin.jfrog.io/artifactory/zookeeper</url>
     </repository>
   </distributionManagement>

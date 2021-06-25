@@ -168,7 +168,7 @@
       <plugin>
         <artifactId>maven-deploy-plugin</artifactId>
         <configuration>
-          <!-- Deploy binary assembly to bintray -->
+          <!-- Deploy artifacts to Bintray/JFrog -->
           <skip>false</skip>
         </configuration>
       </plugin>

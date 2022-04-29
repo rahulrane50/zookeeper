@@ -788,6 +788,7 @@ public class Learner {
                     continue;
                 }
                 packetsCommitted.remove();
+                LOG.debug("Creating request with empty cnxn and empty authinfo");
                 Request request = new Request(null, p.hdr.getClientId(), p.hdr.getCxid(), p.hdr.getType(), null, null);
                 request.setTxn(p.rec);
                 request.setHdr(p.hdr);

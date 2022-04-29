@@ -118,6 +118,12 @@ public class X509ZNodeGroupAclProvider extends ServerAuthenticationProvider {
 
   @Override
   public boolean matches(ServerObjs serverObjs, MatchValues matchValues) {
+    LOG.debug("Server obj cnxn : {}", serverObjs.getCnxn());
+    if (serverObjs.getCnxn() != null) {
+      LOG.debug("Auth info in cnxn obj : {}", serverObjs.getCnxn().getAuthInfo());
+    } else {
+      LOG.debug("Found null cnxn");
+    }
     for (Id id : serverObjs.getCnxn().getAuthInfo()) {
       // Not checking for super user here because the check is already covered
       // in checkAcl() in ZookeeperServer.class

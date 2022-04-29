@@ -1024,6 +1024,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements Req
                     if (ap == null) {
                         LOG.error("Missing AuthenticationProvider for {}", cid.getScheme());
                     } else if (ap.isAuthenticated()) {
+                        LOG.debug("Authenticated successfully : {} {}", a, cid);
                         authIdValid = true;
                         rv.add(new ACL(a.getPerms(), cid));
                     }
@@ -1031,6 +1032,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements Req
                 // If the znode path contains open read access node path prefix, add (world:anyone, r)
                 if (X509AuthenticationConfig.getInstance().getZnodeGroupAclOpenReadAccessPathPrefixes().stream()
                     .anyMatch(path::startsWith)) {
+                    LOG.debug("Found open read access");
                     rv.add(new ACL(ZooDefs.Perms.READ, ZooDefs.Ids.ANYONE_ID_UNSAFE));
                 }
 
@@ -1045,6 +1047,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements Req
                 rv.add(a);
             }
         }
+        LOG.debug("returning rv : {}", rv);
         return rv;
     }
 

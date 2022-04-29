@@ -976,6 +976,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         ByteBuffer to = ByteBuffer.allocate(4);
         to.putInt(timeout);
         cnxn.setSessionId(sessionId);
+        LOG.debug("Creating a new request for session");
         Request si = new Request(cnxn, sessionId, 0, OpCode.createSession, to, null);
         submitRequest(si);
         return sessionId;
@@ -1596,7 +1597,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
                         new ServerAuthenticationProvider.ServerObjs(this, cnxn),
                         authPacket.getAuth());
                 } catch (RuntimeException e) {
-                    LOG.warn("Caught runtime exception from AuthenticationProvider: {}", scheme, e);
+                    LOG.warn("Caught runtime exception from AuthenticationProvider: {} {}", scheme, e);
                     authReturn = KeeperException.Code.AUTHFAILED;
                 }
             }
@@ -1631,6 +1632,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
                 cnxn.sendCloseSession();
                 cnxn.disableRecv();
             } else {
+                LOG.debug("Creating a connection request with cnxn for session : {} auth info : {}", cnxn.getSessionId(), cnxn.getAuthInfo());
                 Request si = new Request(cnxn, cnxn.getSessionId(), h.getXid(), h.getType(), incomingBuffer, cnxn.getAuthInfo());
                 int length = incomingBuffer.limit();
                 if (isLargeRequest(length)) {
@@ -1937,16 +1939,19 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         LOG.debug("Permission requested: {} ", perm);
         LOG.debug("ACLs for node: {}", acl);
         LOG.debug("Client credentials: {}", ids);
+        LOG.debug("Cnxn : {}", cnxn);
 
         if (acl == null || acl.size() == 0) {
             return;
         }
         for (Id authId : ids) {
             if (authId.getScheme().equals("super")) {
+                LOG.debug("Found super scheme returning from here");
                 return;
             }
         }
         for (ACL a : acl) {
+            LOG.debug("Iterating ACLs: {}", a);
             Id id = a.getId();
             if ((a.getPerms() & perm) != 0) {
                 if (id.getScheme().equals("world") && id.getId().equals("anyone")) {
@@ -1955,6 +1960,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
                 ServerAuthenticationProvider ap = ProviderRegistry.getServerProvider(id.getScheme());
                 if (ap != null) {
                     for (Id authId : ids) {
+                        LOG.debug("Iterating IDs : {}", authId);
                         if (authId.getScheme().equals(id.getScheme())
                             && ap.matches(
                                 new ServerAuthenticationProvider.ServerObjs(this, cnxn),

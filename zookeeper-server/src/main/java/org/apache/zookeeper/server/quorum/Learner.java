@@ -788,8 +788,9 @@ public class Learner {
                     continue;
                 }
                 packetsCommitted.remove();
-                LOG.debug("Creating request with empty cnxn and empty authinfo");
+                LOG.debug("[ZKDEBUG] Creating request with empty cnxn and empty authinfo");
                 Request request = new Request(null, p.hdr.getClientId(), p.hdr.getCxid(), p.hdr.getType(), null, null);
+                LOG.debug("[ZKDEBUG] created a request :{}", request.toString());
                 request.setTxn(p.rec);
                 request.setHdr(p.hdr);
                 request.setTxnDigest(p.digest);

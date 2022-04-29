@@ -697,9 +697,11 @@ public class LearnerHandler extends ZooKeeperThread {
                     Request si;
                     if (type == OpCode.sync) {
                         si = new LearnerSyncRequest(this, sessionId, cxid, type, bb, qp.getAuthinfo());
+                        LOG.debug("[ZKDEBUG] created request :{}", si.toString());
                     } else {
                         LOG.debug("Creating request with null cnxn and authinfo : {}", qp.getAuthinfo());
                         si = new Request(null, sessionId, cxid, type, bb, qp.getAuthinfo());
+                        LOG.debug("[ZKDEBUG] created request :{}", si.toString());
                     }
                     si.setOwner(this);
                     learnerMaster.submitLearnerRequest(si);

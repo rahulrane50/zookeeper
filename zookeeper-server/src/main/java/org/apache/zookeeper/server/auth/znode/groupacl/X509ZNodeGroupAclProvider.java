@@ -118,11 +118,12 @@ public class X509ZNodeGroupAclProvider extends ServerAuthenticationProvider {
 
   @Override
   public boolean matches(ServerObjs serverObjs, MatchValues matchValues) {
-    LOG.debug("Server obj cnxn : {}", serverObjs.getCnxn());
+    LOG.debug("[ZKDEBUG] serverobj :{} matchvalues :{}", serverObjs, matchValues);
+    LOG.debug("[ZKDEBUG] Server obj cnxn : {}", serverObjs.getCnxn());
     if (serverObjs.getCnxn() != null) {
-      LOG.debug("Auth info in cnxn obj : {}", serverObjs.getCnxn().getAuthInfo());
+      LOG.debug("[ZKDEBUG] Auth info in cnxn obj : {}", serverObjs.getCnxn().getAuthInfo());
     } else {
-      LOG.debug("Found null cnxn");
+      LOG.debug("[ZKDEBUG] Found null cnxn");
     }
     for (Id id : serverObjs.getCnxn().getAuthInfo()) {
       // Not checking for super user here because the check is already covered

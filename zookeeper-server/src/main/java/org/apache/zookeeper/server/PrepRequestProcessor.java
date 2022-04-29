@@ -676,7 +676,9 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements Req
         validateCreateRequest(path, createMode, request, ttl);
         String parentPath = validatePathForCreate(path, request.sessionId);
 
+        LOG.debug("[ZKDEBUG] request before fixupACL {}", request);
         List<ACL> listACL = fixupACL(path, request.authInfo, acl);
+        LOG.debug("[ZKDEBUG] request after fixupACL {}", request);
         ChangeRecord parentRecord = getRecordForPath(parentPath);
 
         zks.checkACL(request.cnxn, parentRecord.acl, ZooDefs.Perms.CREATE, request.authInfo, path, listACL);
@@ -1024,7 +1026,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements Req
                     if (ap == null) {
                         LOG.error("Missing AuthenticationProvider for {}", cid.getScheme());
                     } else if (ap.isAuthenticated()) {
-                        LOG.debug("Authenticated successfully : {} {}", a, cid);
+                        LOG.debug("[ZKDEBUG] Authenticated successfully : {} {}", a, cid);
                         authIdValid = true;
                         rv.add(new ACL(a.getPerms(), cid));
                     }
@@ -1032,7 +1034,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements Req
                 // If the znode path contains open read access node path prefix, add (world:anyone, r)
                 if (X509AuthenticationConfig.getInstance().getZnodeGroupAclOpenReadAccessPathPrefixes().stream()
                     .anyMatch(path::startsWith)) {
-                    LOG.debug("Found open read access");
+                    LOG.debug("[ZKDEBUG] Found open read access");
                     rv.add(new ACL(ZooDefs.Perms.READ, ZooDefs.Ids.ANYONE_ID_UNSAFE));
                 }
 
@@ -1047,7 +1049,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements Req
                 rv.add(a);
             }
         }
-        LOG.debug("returning rv : {}", rv);
+        LOG.debug("[ZKDEBUG] returning rv : {}", rv);
         return rv;
     }
 

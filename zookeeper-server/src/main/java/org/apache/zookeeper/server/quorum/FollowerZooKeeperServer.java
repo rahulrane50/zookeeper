@@ -80,7 +80,9 @@ public class FollowerZooKeeperServer extends LearnerZooKeeperServer {
     LinkedBlockingQueue<Request> pendingTxns = new LinkedBlockingQueue<Request>();
 
     public void logRequest(TxnHeader hdr, Record txn, TxnDigest digest) {
+        LOG.debug("[ZKDEBUG] Creating a new log request with hdr : {}", hdr);
         Request request = new Request(hdr.getClientId(), hdr.getCxid(), hdr.getType(), hdr, txn, hdr.getZxid());
+        LOG.debug("[ZKDEBUG] created request :{}", request.toString());
         request.setTxnDigest(digest);
         if ((request.zxid & 0xffffffffL) != 0) {
             pendingTxns.add(request);

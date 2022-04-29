@@ -367,7 +367,9 @@ public class Request {
           .append(" type:").append(op2String(type))
           .append(" cxid:0x").append(Long.toHexString(cxid))
           .append(" zxid:0x").append(Long.toHexString(hdr == null ? -2 : hdr.getZxid()))
-          .append(" txntype:").append(hdr == null ? "unknown" : "" + hdr.getType());
+          .append(" txntype:").append(hdr == null ? "unknown" : "" + hdr.getType())
+          .append(" cnxn").append(cnxn == null ? "unknown" : cnxn)
+          .append(" authInfo").append(authInfo == null ? "unknown" : authInfo);
 
         // best effort to print the path assoc with this request
         String path = "n/a";
@@ -390,6 +392,7 @@ public class Request {
                 }
             } catch (Exception e) {
                 // ignore - can't find the path, will output "n/a" instead
+                sb.append(" reqpath exception :").append(e.getMessage());
             }
         }
         sb.append(" reqpath:").append(path);

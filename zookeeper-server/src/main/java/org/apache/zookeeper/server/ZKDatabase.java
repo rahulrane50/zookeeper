@@ -304,8 +304,9 @@ public class ZKDatabase {
     }
 
     private void addCommittedProposal(TxnHeader hdr, Record txn, TxnDigest digest) {
-        LOG.debug("Creating a committed proposal request with null cnxn");
+        LOG.debug("[ZKDEBUG] Creating a committed proposal request with null cnxn");
         Request r = new Request(0, hdr.getCxid(), hdr.getType(), hdr, txn, hdr.getZxid());
+        LOG.debug("[ZKDEBUG] created request :{}", r.toString());
         r.setTxnDigest(digest);
         addCommittedProposal(r);
     }

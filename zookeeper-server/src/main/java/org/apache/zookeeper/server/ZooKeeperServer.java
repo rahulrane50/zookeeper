@@ -1632,8 +1632,9 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
                 cnxn.sendCloseSession();
                 cnxn.disableRecv();
             } else {
-                LOG.debug("Creating a connection request with cnxn for session : {} auth info : {}", cnxn.getSessionId(), cnxn.getAuthInfo());
+                LOG.debug("[ZKDEBUG] Creating a connection request with cnxn for session : {} auth info : {}", cnxn.getSessionId(), cnxn.getAuthInfo());
                 Request si = new Request(cnxn, cnxn.getSessionId(), h.getXid(), h.getType(), incomingBuffer, cnxn.getAuthInfo());
+                LOG.debug("[ZKDEBUG] created new request :{}", si.toString());
                 int length = incomingBuffer.limit();
                 if (isLargeRequest(length)) {
                     // checkRequestSize will throw IOException if request is rejected
@@ -1939,19 +1940,19 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         LOG.debug("Permission requested: {} ", perm);
         LOG.debug("ACLs for node: {}", acl);
         LOG.debug("Client credentials: {}", ids);
-        LOG.debug("Cnxn : {}", cnxn);
+        LOG.debug("[ZKDEBUG] Cnxn : {}", cnxn);
 
         if (acl == null || acl.size() == 0) {
             return;
         }
         for (Id authId : ids) {
             if (authId.getScheme().equals("super")) {
-                LOG.debug("Found super scheme returning from here");
+                LOG.debug("[ZKDEBUG] Found super scheme returning from here");
                 return;
             }
         }
         for (ACL a : acl) {
-            LOG.debug("Iterating ACLs: {}", a);
+            LOG.debug("[ZKDEBUG] Iterating ACLs: {}", a);
             Id id = a.getId();
             if ((a.getPerms() & perm) != 0) {
                 if (id.getScheme().equals("world") && id.getId().equals("anyone")) {
@@ -1960,7 +1961,8 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
                 ServerAuthenticationProvider ap = ProviderRegistry.getServerProvider(id.getScheme());
                 if (ap != null) {
                     for (Id authId : ids) {
-                        LOG.debug("Iterating IDs : {}", authId);
+                        LOG.debug("[ZKDEBUG] Iterating IDs : {}", authId);
+                        LOG.debug("[ZKDEBUG] cnxn :{}", cnxn);
                         if (authId.getScheme().equals(id.getScheme())
                             && ap.matches(
                                 new ServerAuthenticationProvider.ServerObjs(this, cnxn),

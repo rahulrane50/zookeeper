@@ -201,6 +201,7 @@ public class Observer extends Learner {
             txn = logEntry.getTxn();
             digest = logEntry.getDigest();
             Request request = new Request(hdr.getClientId(), hdr.getCxid(), hdr.getType(), hdr, txn, 0);
+            LOG.debug("[ZKDEBUG] Request created : {}", request.toString());
             request.logLatency(ServerMetrics.getMetrics().COMMIT_PROPAGATION_LATENCY);
             request.setTxnDigest(digest);
             ObserverZooKeeperServer obs = (ObserverZooKeeperServer) zk;
@@ -220,6 +221,7 @@ public class Observer extends Learner {
             QuorumVerifier qv = self.configFromString(new String(((SetDataTxn) txn).getData()));
 
             request = new Request(hdr.getClientId(), hdr.getCxid(), hdr.getType(), hdr, txn, 0);
+            LOG.debug("[ZKDEBUG] Request created : {}", request.toString());
             request.setTxnDigest(digest);
             obs = (ObserverZooKeeperServer) zk;
 

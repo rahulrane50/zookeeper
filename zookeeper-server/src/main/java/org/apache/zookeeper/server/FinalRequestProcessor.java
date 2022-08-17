@@ -274,7 +274,7 @@ public class FinalRequestProcessor implements RequestProcessor {
                             break;
                         case OpCode.getData:
                             rec = handleGetDataRequest(readOp.toRequestRecord(), cnxn, request.authInfo);
-                            GetDataResponse gdr = (GetDataResponse) rec;x
+                            GetDataResponse gdr = (GetDataResponse) rec;
                             subResult = new GetDataResult(gdr.getData(), gdr.getStat());
                             break;
                         default:

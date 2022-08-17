@@ -227,6 +227,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     public static final String GET_DATA_RESPONSE_CACHE_SIZE = "zookeeper.maxResponseCacheSize";
     public static final String GET_CHILDREN_RESPONSE_CACHE_SIZE = "zookeeper.maxGetChildrenResponseCacheSize";
 
+    // TODO: RR: Move this config to QuorumPeerConfig and system properties which could fix current braking UTs.
     // Max ephemeral node throttling config, when enabled (>=0) it will throttle ephemeral node creation
     // requests once it exceeds limit per session. By default it is disabled and set to -1.
     public static final String ZOOKEEPER_MAX_EPHEMERAL_COUNT_PER_SESSION = "zookeeper.ephemeral.count.limit";

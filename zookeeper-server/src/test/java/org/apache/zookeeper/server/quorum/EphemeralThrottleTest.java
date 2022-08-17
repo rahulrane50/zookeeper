@@ -20,6 +20,8 @@ import org.apache.zookeeper.server.ServerMetrics;
 import org.apache.zookeeper.server.ZooKeeperServer;
 import org.apache.zookeeper.test.ClientBase;
 import org.junit.Test;
+import org.junit.After;
+import org.junit.Before;
 
 public class EphemeralThrottleTest extends QuorumPeerTestBase {
 
@@ -27,12 +29,26 @@ public class EphemeralThrottleTest extends QuorumPeerTestBase {
   final static int NUM_SERVERS = 5;
   final static String PATH = "/eph-test";
 
+  @Before
+  public void setUp() throws Exception {
+    ClientBase.setupTestEnv();
+
+    // just to get rid of the unrelated 'InstanceAlreadyExistsException' in the logs
+    System.setProperty("zookeeper.jmx.log4j.disable", "true");
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    super.tearDown();
+    System.clearProperty("zookeeper.jmx.log4j.disable");
+  }
+
   /*
    * TODO : Add following UT scenarios
    * 1. Creating ephemeral nodes through any server in quorum
    * 2. Removing session should delete all counters
    * 3. Restarting zookeeper server should keep count up-todate
-   * 4. Fix create and then delete before commit test case. 
+   * 4. Fix create and then delete before commit test case.
    */
   @Test(expected = KeeperException.SessionEphemeralCountExceedException.class)
   public void limitingEphemeralsTest() throws Exception {
@@ -86,7 +102,7 @@ public class EphemeralThrottleTest extends QuorumPeerTestBase {
       threw = true;
     }
     assertTrue(threw);
-  }*/
+  }
 
   /**
    *  Check that our emitted metric around the number of request rejections from too many ephemerals is accurate.

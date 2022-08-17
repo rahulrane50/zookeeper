@@ -75,6 +75,7 @@ import org.apache.zookeeper.proto.RemoveWatchesRequest;
 import org.apache.zookeeper.proto.ReplyHeader;
 import org.apache.zookeeper.proto.SetACLResponse;
 import org.apache.zookeeper.proto.SetDataResponse;
+import org.apache.zookeeper.txn.CreateTxn;
 import org.apache.zookeeper.proto.SetWatches;
 import org.apache.zookeeper.proto.SetWatches2;
 import org.apache.zookeeper.proto.SyncRequest;
@@ -273,7 +274,7 @@ public class FinalRequestProcessor implements RequestProcessor {
                             break;
                         case OpCode.getData:
                             rec = handleGetDataRequest(readOp.toRequestRecord(), cnxn, request.authInfo);
-                            GetDataResponse gdr = (GetDataResponse) rec;
+                            GetDataResponse gdr = (GetDataResponse) rec;x
                             subResult = new GetDataResult(gdr.getData(), gdr.getStat());
                             break;
                         default:
@@ -291,6 +292,10 @@ public class FinalRequestProcessor implements RequestProcessor {
                 rsp = new CreateResponse(rc.path);
                 err = Code.get(rc.err);
                 requestPathMetricsCollector.registerRequest(request.type, rc.path);
+                CreateTxn createTxn = (CreateTxn) request.getTxn();
+                if (zks.isMaxEphemeralNodesPerSessionThrottlingEnabled() && createTxn.getEphemeral() && rc.err == Code.OK.intValue()) {
+                    zks.incEphemeralNodesPerSession(request.sessionId);
+                }
                 break;
             }
             case OpCode.create2:
@@ -300,6 +305,12 @@ public class FinalRequestProcessor implements RequestProcessor {
                 rsp = new Create2Response(rc.path, rc.stat);
                 err = Code.get(rc.err);
                 requestPathMetricsCollector.registerRequest(request.type, rc.path);
+                if (zks.isMaxEphemeralNodesPerSessionThrottlingEnabled() && request.type == OpCode.create2  && rc.err == Code.OK.intValue()) {
+                    CreateTxn createTxn = (CreateTxn) request.getTxn();
+                    if (createTxn.getEphemeral()) {
+                        zks.incEphemeralNodesPerSession(request.sessionId);
+                    }
+                }
                 break;
             }
             case OpCode.delete:
@@ -307,6 +318,9 @@ public class FinalRequestProcessor implements RequestProcessor {
                 lastOp = "DELE";
                 err = Code.get(rc.err);
                 requestPathMetricsCollector.registerRequest(request.type, rc.path);
+                if (zks.isMaxEphemeralNodesPerSessionThrottlingEnabled() && rc.err == Code.OK.intValue()) {
+                    zks.decEphemeralNodesPerSession(request.sessionId);
+                }
                 break;
             }
             case OpCode.setData: {
@@ -334,6 +348,9 @@ public class FinalRequestProcessor implements RequestProcessor {
             case OpCode.closeSession: {
                 lastOp = "CLOS";
                 err = Code.get(rc.err);
+                if (zks.isMaxEphemeralNodesPerSessionThrottlingEnabled() && rc.err == Code.OK.intValue()) {
+                    zks.resetEphemeralNodesPerSession(request.sessionId);
+                }
                 break;
             }
             case OpCode.sync: {

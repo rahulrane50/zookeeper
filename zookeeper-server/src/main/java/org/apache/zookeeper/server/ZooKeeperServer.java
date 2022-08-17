@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import javax.security.sasl.SaslException;
@@ -225,6 +227,14 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     public static final String GET_DATA_RESPONSE_CACHE_SIZE = "zookeeper.maxResponseCacheSize";
     public static final String GET_CHILDREN_RESPONSE_CACHE_SIZE = "zookeeper.maxGetChildrenResponseCacheSize";
 
+    // Max ephemeral node throttling config, when enabled (>=0) it will throttle ephemeral node creation
+    // requests once it exceeds limit per session. By default it is disabled and set to -1.
+    public static final String ZOOKEEPER_MAX_EPHEMERAL_COUNT_PER_SESSION = "zookeeper.ephemeral.count.limit";
+    private static ConcurrentMap<Long, Integer> ephemeralNodesPerSessionMap;
+    // max number of ephemeral nodes that can be created per session
+    private static int maxEphemeralNodesPerSession;
+    public static boolean ephemeralNodesPerSessionThrottlingEnabled;
+
     static {
         long configuredFlushDelay = Long.getLong(FLUSH_DELAY, 0);
         setFlushDelay(configuredFlushDelay);
@@ -241,6 +251,12 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         }
 
         LOG.info("{} = {}", INT_BUFFER_STARTING_SIZE_BYTES, intBufferStartingSizeBytes);
+
+        ephemeralNodesPerSessionMap = new ConcurrentHashMap<>();
+        maxEphemeralNodesPerSession = Integer.getInteger(ZOOKEEPER_MAX_EPHEMERAL_COUNT_PER_SESSION, -1);
+        LOG.info("{} = {}", ZOOKEEPER_MAX_EPHEMERAL_COUNT_PER_SESSION, maxEphemeralNodesPerSession);
+
+        ephemeralNodesPerSessionThrottlingEnabled = maxEphemeralNodesPerSession <= 0 ? false : true;
     }
 
     // Connection throttling
@@ -902,7 +918,6 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         }
         return 0;
     }
-
     static class PrecalculatedDigest {
         final long nodeDigest;
         final long treeDigest;
@@ -1483,6 +1498,39 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     private void initLargeRequestThrottlingSettings() {
         setLargeRequestMaxBytes(Integer.getInteger("zookeeper.largeRequestMaxBytes", largeRequestMaxBytes));
         setLargeRequestThreshold(Integer.getInteger("zookeeper.largeRequestThreshold", -1));
+    }
+
+    public void initMaxEphemeralNodesPerSession() {
+        if (ephemeralNodesPerSessionThrottlingEnabled) {
+            for (Map.Entry<Long, Set<String>> entry : getZKDatabase().getEphemerals().entrySet()) {
+                ephemeralNodesPerSessionMap.put(entry.getKey(), entry.getValue().size());
+            }
+        }
+    }
+
+    public boolean isMaxEphemeralNodesPerSessionThrottlingEnabled() {
+        return ephemeralNodesPerSessionThrottlingEnabled;
+    }
+
+    public int getMaxEphemeralNodesPerSession() {
+        return maxEphemeralNodesPerSession;
+    }
+
+    public int getEphemeralNodesPerSession(long sessionId) {
+        return ephemeralNodesPerSessionMap.getOrDefault(sessionId, 0);
+    }
+
+    public void incEphemeralNodesPerSession(long sessionId) {
+        int count = ephemeralNodesPerSessionMap.getOrDefault(sessionId, 0);
+        ephemeralNodesPerSessionMap.put(sessionId, count + 1);
+    }
+
+    public void decEphemeralNodesPerSession(long sessionId) {
+        ephemeralNodesPerSessionMap.computeIfPresent(sessionId, (key, value) -> value - 1);
+    }
+
+    public void resetEphemeralNodesPerSession(long sessionId) {
+        ephemeralNodesPerSessionMap.remove(sessionId);
     }
 
     public int getLargeRequestMaxBytes() {

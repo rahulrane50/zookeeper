@@ -121,6 +121,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements Req
             + "):", zks.getZooKeeperServerListener());
         this.nextProcessor = nextProcessor;
         this.zks = zks;
+        this.zks.initMaxEphemeralNodesPerSession();
         this.digestEnabled = ZooKeeperServer.isDigestEnabled();
         if (this.digestEnabled) {
             this.digestCalculator = new DigestCalculator();
@@ -677,6 +678,14 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements Req
         CreateMode createMode = CreateMode.fromFlag(flags);
         validateCreateRequest(path, createMode, request, ttl);
         String parentPath = validatePathForCreate(path, request.sessionId);
+
+        if (createMode.isEphemeral() && zks.isMaxEphemeralNodesPerSessionThrottlingEnabled()) {
+            int count = zks.getEphemeralNodesPerSession(request.sessionId);
+            if (count >= zks.getMaxEphemeralNodesPerSession()) {
+                ServerMetrics.getMetrics().EPHEMERAL_VIOLATION_REQUEST_REJECTION_COUNT.inc();
+                throw new KeeperException.SessionEphemeralCountExceedException();
+            }
+        }
 
         List<ACL> listACL = fixupACL(path, request.authInfo, acl);
         ChangeRecord parentRecord = getRecordForPath(parentPath);

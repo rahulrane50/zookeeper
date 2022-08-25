@@ -306,6 +306,7 @@ public class CnxManagerTest extends ZKTestCase {
         final Map<Long, QuorumServer> unresolvablePeers = new HashMap<>();
         final long myid = 1L;
         unresolvablePeers.put(myid, new QuorumServer(myid, "unresolvable-domain.org:2182:2183;2181"));
+        // Note: Make sure NO local zk server is already running on this port.
         final QuorumPeer peer = new QuorumPeer(unresolvablePeers, ClientBase.createTmpDir(), ClientBase.createTmpDir(), 2181, 3, myid, 1000, 2, 2, 2);
         final QuorumCnxManager cnxManager = peer.createCnxnManager();
         final QuorumCnxManager.Listener listener = cnxManager.listener;

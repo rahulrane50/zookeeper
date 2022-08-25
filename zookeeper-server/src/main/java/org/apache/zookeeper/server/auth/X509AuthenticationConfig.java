@@ -18,13 +18,12 @@
 
 package org.apache.zookeeper.server.auth;
 
+import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.zookeeper.server.auth.znode.groupacl.X509ZNodeGroupAclProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -230,6 +229,10 @@ public class X509AuthenticationConfig {
     this.znodeGroupAclServerDedicatedDomain = znodeGroupAclServerDedicatedDomain;
   }
 
+  public void setStoreAuthedClientIdEnabled(String enabled) {
+    storeAuthedClientIdEnabled = enabled;
+  }
+
   // Getters for X509 properties
 
   public String getClientCertIdType() {
@@ -267,10 +270,6 @@ public class X509AuthenticationConfig {
     }
     return clientCertIdSanExtractMatcherGroupIndex == -1 ? 0
         : clientCertIdSanExtractMatcherGroupIndex;
-  }
-
-  public void setStoreAuthedClientIdEnabled(String enabled) {
-    storeAuthedClientIdEnabled = enabled;
   }
 
   // Getters for X509 Znode Group Acl properties

@@ -23,9 +23,9 @@ name: CI
 
 on:
   push:
-    branches: [master, 'li-dev/**']
+    branches: [master, 'li-dev\/**']
   pull_request:
-    branches: [master, 'li-dev/**']
+    branches: [master, 'li-dev\/**']
 
 jobs:
   mvn:
